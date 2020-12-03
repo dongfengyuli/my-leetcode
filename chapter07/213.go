@@ -3,11 +3,27 @@ package main
 import "fmt"
 
 func main(){
-	nums := []int{1,2,3,1,7,9,1,2}
-	res := rob(nums)
+	nums := []int{1,2,3,1}
+	res := rob2(nums)
 	fmt.Println(res)
 }
 
+
+
+
+
+func rob2(nums []int) int{
+	if len(nums) == 0 {
+		return 0
+	}
+	if len(nums) == 1 {
+		return nums[0]
+	}
+
+	return maxInt(rob(nums[1:]),rob(nums[:len(nums) -1]))
+}
+
+//198
 func rob(nums []int) int{
 	if nil == nums || len(nums)<1{
 		return 0
@@ -35,8 +51,3 @@ func maxInt(a,b int) int{
 	}
 	return b
 }
-
-//备注：打家劫舍
-//198
-//213
-//337
