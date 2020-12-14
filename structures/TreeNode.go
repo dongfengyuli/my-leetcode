@@ -231,3 +231,87 @@ func T2s(head *TreeNode, array *[]int) {
 		T2s(head.Right, array)
 	}
 }
+
+//104. 二叉树的最大深度
+
+func MaxDepth(root *TreeNode) int{
+	if nil == root{
+		return 0
+	}
+
+	left := MaxDepth(root.Left)
+	right := MaxDepth(root.Right)
+
+	if left >= right{
+		return left + 1
+	}else {
+		return right + 1
+	}
+}
+
+//110. 平衡二叉树
+
+func IsBalanced(root *TreeNode) bool{
+	if nil == root{
+		return true
+	}
+	//fmt.Println("MaxDepth(root.Left)",MaxDepth(root.Left))
+	//fmt.Println("MaxDepth(root.Right)",MaxDepth(root.Right))
+	diff := MaxDepth(root.Left) - MaxDepth(root.Right)
+	if diff > 1 || diff < -1{
+		return false
+	}
+	return IsBalanced(root.Left) && IsBalanced(root.Right)
+}
+
+//543. 二叉树的直径
+
+func DiameterOfBinaryTree(root *TreeNode) int{
+	ans := 0
+	if nil == root{
+		return ans
+	}
+
+	left := MaxDepth(root.Left)
+	right := MaxDepth(root.Right)
+	if left + right > ans{
+		ans = left + right
+	}
+	return ans
+}
+
+//437. 路径总和 III
+
+func PathSum(root *TreeNode,sum int) int{
+	if nil == root{
+		return 0
+	}
+	return pathSumFrom(root,sum) + PathSum(root.Left,sum) + PathSum(root.Right,sum)
+}
+
+func pathSumFrom(node *TreeNode,sum int) int{
+	if nil == node{
+		return 0
+	}
+	ans := 0
+	if node.Val == sum {
+		ans = 1
+	}
+	return ans + pathSumFrom(node.Left,sum - node.Val) + pathSumFrom(node.Right,sum-node.Val)
+}
+
+//101. 对称二叉树
+
+func IsSymmetric(root *TreeNode) bool{
+	return nil == root || isSame(root.Left,root.Right)
+}
+
+func isSame(left,right *TreeNode) bool{
+	if nil == left || nil ==right{
+		return left == right
+	}else if left.Val != right.Val{
+		return false
+	}else{
+		return isSame(left.Left,right.Right) && isSame(left.Right,right.Left)
+	}
+}
