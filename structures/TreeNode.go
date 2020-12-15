@@ -315,3 +315,125 @@ func isSame(left,right *TreeNode) bool{
 		return isSame(left.Left,right.Right) && isSame(left.Right,right.Left)
 	}
 }
+
+//二叉树的前序遍历
+//方法一：递归
+
+/*func PreOrderTraversal(root *TreeNode) []int{
+	res := []int{}
+	if root == nil{
+		return res
+	}
+	res = append(res,root.Val)
+	res = append(res,PreOrderTraversal(root.Left)...)
+	res = append(res,PreOrderTraversal(root.Right)...)
+	return res
+}*/
+
+//方法二：迭代
+func PreOrderTraversal(root *TreeNode) []int{
+	if root == nil{
+		return nil
+	}
+
+	var stack []*TreeNode
+	stack = append(stack,root)
+
+	var res []int
+	for len(stack) > 0{
+		p := stack[len(stack) -1]
+		stack = stack[0:len(stack) -1]
+		res = append(res,p.Val)
+		if p.Right != nil{
+			stack = append(stack,p.Right)
+		}
+		if p.Left != nil {
+			stack = append(stack,p.Left)
+		}
+	}
+	return res
+}
+
+//94. 二叉树的中序遍历
+//方法一：递归
+
+/*var res []int
+func InOrderTraversal(root *TreeNode) []int {
+	//res = make([]int, 0)
+	dfs(root)
+	return res
+}
+
+func dfs(root *TreeNode) {
+	if root != nil {
+		dfs(root.Left)
+		res = append(res, root.Val)
+		dfs(root.Right)
+	}
+}*/
+
+
+//方法二：迭代
+
+func InOrderTraversal(root *TreeNode) []int{
+	if root == nil{
+		return nil
+	}
+
+	var stack []*TreeNode
+	var res []int
+
+	for root != nil || len(stack) > 0{
+		for root != nil{
+			stack = append(stack,root)
+			root = root.Left
+		}
+		root = stack[len(stack) -1]
+		stack = stack[:len(stack) -1]
+		res = append(res,root.Val)
+		root = root.Right
+	}
+	return res
+}
+
+//145. 二叉树的后序遍历
+
+/*var res []int
+func PostOrderTraversal(root *TreeNode) []int {
+	//res = make([]int, 0)
+	dfs(root)
+	return res
+}
+
+func dfs(root *TreeNode) {
+	if root != nil {
+		dfs(root.Left)
+		dfs(root.Right)
+		res = append(res, root.Val)
+	}
+}*/
+
+
+func PostOrderTraversal(root *TreeNode) []int{
+	if root == nil{
+		return nil
+	}
+	res := []int{}
+	stack := []*TreeNode{root}
+	var node *TreeNode
+
+	for len(stack) > 0{
+		node,stack = stack[len(stack) - 1],stack[:len(stack) -1]
+		//fmt.Println("res","node","node.Val",res,node,node.Val)
+		res = append([]int{node.Val},res...)
+		if node.Left != nil{
+			stack = append(stack,node.Left)
+		}
+		if node.Right != nil {
+			stack = append(stack,node.Right)
+		}
+	}
+	return res
+}
+
+//102. 二叉树的层序遍历
