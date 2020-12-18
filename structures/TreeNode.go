@@ -437,3 +437,281 @@ func PostOrderTraversal(root *TreeNode) []int{
 }
 
 //102. 二叉树的层序遍历
+//方法一：递归
+/*var res [][]int
+
+func LevelOrder(root *TreeNode) [][]int{
+	res = [][]int{}
+	dfs(root,0)
+	return res
+}
+
+func dfs(root *TreeNode,level int){
+	if root != nil{
+		if len(res) == level{
+			res = append(res,[]int{})
+		}
+		res[level] = append(res[level],root.Val)
+		dfs(root.Left,level+1)
+		dfs(root.Right,level+1)
+	}
+}*/
+
+//方法二:广度优先搜索
+
+func LevelOrder(root *TreeNode) [][]int{
+	res := [][]int{}
+	if root == nil {
+		return res
+	}
+	q := []*TreeNode{root}
+	for i:=0;len(q)>0;i++{
+		res = append(res,[]int{})
+		p := []*TreeNode{}
+		for j:=0;j<len(q);j++{
+			node := q[j]
+			res[i] = append(res[i],node.Val)
+			if node.Left != nil {
+				p = append(p,node.Left)
+			}
+			if node.Right != nil{
+				p = append(p,node.Right)
+			}
+		}
+		q = p
+	}
+
+	return res
+}
+
+//637. 二叉树的层平均值
+
+func AverageOfLevels(root *TreeNode) []float64{
+	if nil == root{
+		return nil
+	}
+
+	ans := make([]float64,0)
+	// 模拟队列
+	queue := make([]*TreeNode,0)
+	queue = append(queue,root)
+	for len(queue) != 0{
+		n := len(queue)
+		sum := 0.0
+		for i:=0;i<n;i++{
+			node := queue[0]
+			sum += float64(node.Val)
+			if nil != node.Left{
+				queue = append(queue,node.Left)
+			}
+			if nil != node.Right{
+				queue = append(queue,node.Right)
+			}
+			// 从队列中删除头部元素，相当于头部元素出队
+			queue = queue[1:]
+		}
+		ans = append(ans,sum/float64(n))
+	}
+
+	return ans
+}
+
+//105. 从前序与中序遍历序列构造二叉树
+
+/*func BuildTree(preorder []int,inorder []int) *TreeNode{
+	if len(preorder) == 0 || len(inorder) == 0{
+		return nil
+	}
+
+	// 中顺序列找根结点
+	var root int
+	for k,v := range inorder{
+		if v == preorder[0]{
+			root = k
+			break
+		}
+	}
+
+	// 左右子树递归
+	return &TreeNode{
+		Val:preorder[0],
+		Left:BuildTree(preorder[1:root+1],inorder[0:root]),
+		Right:BuildTree(preorder[root+1:],inorder[root+1:]),
+	}
+}*/
+
+//106. 从中序与后序遍历序列构造二叉树
+
+func BuildTree(inorder []int, postorder []int) *TreeNode {
+	if len(inorder) == 0 || len(postorder) == 0 {
+		return nil
+	}
+	rv := postorder[len(postorder)-1]
+	var i int
+	for i = range inorder {
+		if inorder[i] == rv {
+			break
+		}
+	} // what if rv does not exist in inorder?
+	return &TreeNode{
+		Val:   rv,
+		Left:  BuildTree(inorder[:i], postorder[:i]),
+		Right: BuildTree(inorder[i+1:], postorder[i:len(postorder)-1]),
+	}
+}
+
+//669. 修剪二叉搜索树
+
+func TrimBST(root *TreeNode,L int,R int)  *TreeNode{
+	if nil == root{
+		return nil
+	}
+	if root.Val < L{
+		return TrimBST(root.Right,L,R)
+	}
+	if root.Val >R{
+		return TrimBST(root.Left,L,R)
+	}
+	root.Left  = TrimBST(root.Left,L,R)
+	root.Right  = TrimBST(root.Right,L,R)
+	return root
+}
+
+//226. 翻转二叉树
+
+func InvertTree(root *TreeNode) *TreeNode{
+	if nil == root{
+		return nil
+	}
+	return &TreeNode{
+		Val:root.Val,
+		Left:InvertTree(root.Right),
+		Right:InvertTree(root.Left),
+	}
+}
+
+//617. 合并二叉树
+
+func MergeTrees(t1 *TreeNode,t2 *TreeNode) *TreeNode{
+	if nil == t1{
+		return t2
+	}
+	if nil == t2{
+		return t1
+	}
+	return &TreeNode{
+		Val:t1.Val + t2.Val,
+		Left:MergeTrees(t1.Left,t2.Left),
+		Right:MergeTrees(t1.Right,t2.Right),
+	}
+}
+
+//572. 另一个树的子树
+
+func IsSubtree(s *TreeNode,t *TreeNode) bool{
+	if nil == s || nil == t{
+		return s == t || nil == t
+	}
+	return isSame1(s,t) || IsSubtree(s.Left,t) || IsSubtree(s.Right,t)
+}
+
+func isSame1(t1,t2 *TreeNode) bool{
+	if nil == t1 || nil == t2{
+		return t1 == t2
+	}
+	return t1.Val == t2.Val && isSame(t1.Left,t2.Left) && isSame(t1.Right,t2.Right)
+}
+
+//404. 左叶子之和
+
+func SumOfLeftLeaves(root *TreeNode) int{
+	if nil == root{
+		return 0
+	}
+
+	sum := 0
+	if nil != root.Left && nil == root.Left.Left && nil == root.Left.Right{
+		sum += root.Left.Val
+	}else {
+		sum += SumOfLeftLeaves(root.Left)
+	}
+
+	sum += SumOfLeftLeaves(root.Right)
+	return sum
+}
+
+//513. 找树左下角的值
+//bfs
+func FindBottomLeftValue(root *TreeNode) int {
+	var queue []*TreeNode
+	queue = append(queue, root)
+	cur := 1
+	var res int
+	for {
+		if len(queue) <= 0 {
+			break
+		}
+		res = queue[0].Val
+		for i := 0; i < cur; i++ {
+			temp := queue[0]
+			queue = queue[1:]
+
+			if temp.Left != nil {
+				queue = append(queue, temp.Left)
+			}
+			if temp.Right != nil {
+				queue = append(queue, temp.Right)
+			}
+		}
+		cur = len(queue)
+	}
+	return res
+}
+
+//dfs 耗时最少
+/*func FindBottomLeftValue(root *TreeNode) int{
+	if root.Left == nil && root.Right == nil{
+		return root.Val
+	}
+	val,maxLevel := 0,0
+	dfsFindBottomLeftValue(root, &val, &maxLevel, 0)
+	return val
+}
+
+func dfsFindBottomLeftValue(root *TreeNode, val, maxLevel *int, level int){
+	if root == nil{
+		return
+	}
+	dfsFindBottomLeftValue(root.Left, val, maxLevel, level+1)
+	if level > *maxLevel{
+		*maxLevel = level
+		*val = root.Val
+	}
+	dfsFindBottomLeftValue(root.Right, val, maxLevel, level+1)
+}*/
+
+//538. 把二叉搜索树转换为累加树
+
+
+func ConvertBST(root *TreeNode) *TreeNode {
+	if nil == root {
+		return root
+	}
+
+	sums := 0
+	convertBSTCore(root,&sums)
+	return root
+}
+
+func convertBSTCore(root *TreeNode,sum *int){
+	if nil == root {
+		return
+	}
+
+	convertBSTCore(root.Right,sum)
+
+	root.Val += *sum
+	*sum = root.Val
+
+	convertBSTCore(root.Left,sum)
+}
